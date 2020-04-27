@@ -6,12 +6,40 @@
 import UIKit
 import OHHTTPStubs
 
-struct Recommendation {
+struct Recommendation: Codable {
     var imageURL = String()
     var title = String()
     var tagline = String()
-    var rating: Float = 0.0
+    var rating: Double = 0.0
     var isReleased: Bool = false
+}
+
+extension Recommendation {
+    init?(json: [String: Any]) {
+        guard let rating = json["rating"] as? Double else { return nil }
+        self.title = json["title"] as? String ?? title
+        self.isReleased = json["is_released"] as? Bool ?? isReleased
+        self.rating =  rating
+        self.tagline = json["tagline"] as? String ?? tagline
+        self.imageURL = json["image"] as? String ?? imageURL
+    }
+    
+    static let documentsdirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    static let archiveurl = documentsdirectory.appendingPathComponent("recommendations").appendingPathExtension("plist")
+    static func cache (recommendations: [Recommendation]) {
+        let plistDecoder = PropertyListEncoder()
+        let encoded = try? plistDecoder.encode(recommendations)
+        try? encoded?.write(to : archiveurl , options : .noFileProtection)
+    }
+    static func load() -> [Recommendation]? {
+       let plistDecoder = PropertyListDecoder()
+       do {
+          let recommendations = try Data(contentsOf: archiveurl)
+          return try plistDecoder.decode([Recommendation].self, from: recommendations)
+       } catch {
+         return nil
+       }
+    }
 }
 
 class RecommendationsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -42,44 +70,34 @@ class RecommendationsViewController: UIViewController, UITableViewDataSource, UI
         let request = URLRequest(url: url)
         let session = URLSession(configuration: .default)
 
+        if let recommendations = Recommendation.load() {
+            self.recommendations = recommendations
+            self.tableView.reloadData()
+        }
+
         let task = session.dataTask(with: request, completionHandler: { (data, response, error) in
             guard let receivedData = data else { return }
             
             // TASK: This feels gross and smells. Can this json parsing be made more robust and extensible?
             do {
-                let json = try JSONSerialization.jsonObject(with: receivedData, options: JSONSerialization.ReadingOptions(rawValue: UInt(0))) as! [String: AnyObject]
-                
-                if let titles = json["titles"] as? [[String: AnyObject]] {
-                    for title in titles {
-                        var recommendation = Recommendation()
-                        
-                        if let name = title["title"] as? String {
-                            recommendation.title = name
+                if let json = try JSONSerialization.jsonObject(with: receivedData, options: JSONSerialization.ReadingOptions(rawValue: UInt(0))) as? [String: Any], let titles = json["titles"] as? [[String: AnyObject]], let titlesSkipped = json["skipped"] as? [String], let titlesOwned = json["titles_owned"] as? [String] {
+                    
+                    self.recommendations = [Recommendation]()
+                    for item in titles {
+                        if let recommendation = Recommendation(json: item) {
+                            self.recommendations.append(recommendation)
                         }
-                        
-                        if let isReleased = title["is_released"] as? Bool {
-                            recommendation.isReleased = isReleased
-                        }
-                        
-                        if let ratingObj = title["rating"],
-                            let rating = Float("\(ratingObj)") {
-                            recommendation.rating = rating
-                        }
-                        
-                        if let tagline = title["tagline"] as? String {
-                            recommendation.tagline = tagline
-                        }
-                        
-                        if let image = title["image"] as? String {
-                            recommendation.imageURL = image
-                        }
-
-                        self.recommendations.append(recommendation)
                     }
-                }
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
+                    let sortedSlice = self.recommendations
+                        .filter( { $0.isReleased && !titlesOwned.contains($0.title) && !titlesSkipped.contains($0.title) })
+                        .sorted( by: { $0.rating > $1.rating } )
+                        .prefix(10)
+                    self.recommendations = Array(sortedSlice)
+                    Recommendation.cache(recommendations: self.recommendations)
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
                 }
             }
             catch {
@@ -98,15 +116,8 @@ class RecommendationsViewController: UIViewController, UITableViewDataSource, UI
         cell.titleLabel.text = recommendation.title
         cell.taglineLabel.text = recommendation.tagline
         cell.ratingLabel.text = "Rating: \(recommendation.rating)"
-        
-        if let url = URL(string: recommendation.imageURL) {
-            let data = try? Data(contentsOf: url)
 
-            if let imageData = data {
-                let image = UIImage(data: imageData)
-                cell.recommendationImageView?.image = image
-            }
-        }
+        cell.recommendationImageView.downloadImageFrom(link: recommendation.imageURL, contentMode: UIView.ContentMode.scaleAspectFit)
 
         return cell
     }
@@ -116,6 +127,6 @@ class RecommendationsViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 134
+        return UITableView.automaticDimension
     }
 }

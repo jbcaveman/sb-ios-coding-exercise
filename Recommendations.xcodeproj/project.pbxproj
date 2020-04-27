@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5D49EBB224576EA20039AB8D /* UIImageView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D49EBB124576EA20039AB8D /* UIImageView+Ext.swift */; };
 		7A7852F4244F410900651421 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7852F3244F410900651421 /* AppDelegate.swift */; };
 		7A7852F8244F410900651421 /* RecommendationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7852F7244F410900651421 /* RecommendationsViewController.swift */; };
 		7A7852FB244F410900651421 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A7852F9244F410900651421 /* Main.storyboard */; };
@@ -23,6 +24,7 @@
 		023FD0B1C204B2A9FD2FFC15 /* Pods-Recommendations.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Recommendations.debug.xcconfig"; path = "Target Support Files/Pods-Recommendations/Pods-Recommendations.debug.xcconfig"; sourceTree = "<group>"; };
 		296F577824B62DA31BB5053D /* Pods-Recommendations.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Recommendations.release.xcconfig"; path = "Target Support Files/Pods-Recommendations/Pods-Recommendations.release.xcconfig"; sourceTree = "<group>"; };
 		4837A2CE5DC84736E4DD6D1B /* libPods-Recommendations.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Recommendations.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D49EBB124576EA20039AB8D /* UIImageView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Ext.swift"; sourceTree = "<group>"; };
 		7A7852F0244F410900651421 /* Recommended.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recommended.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A7852F3244F410900651421 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7A7852F7244F410900651421 /* RecommendationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationsViewController.swift; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				7A7852FC244F410B00651421 /* Assets.xcassets */,
 				7A7852FE244F410B00651421 /* LaunchScreen.storyboard */,
 				7A785301244F410B00651421 /* Info.plist */,
+				5D49EBB124576EA20039AB8D /* UIImageView+Ext.swift */,
 			);
 			path = Recommendations;
 			sourceTree = "<group>";
@@ -208,6 +211,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7A87BB3C244F5C38008A8669 /* RecommendationTableViewCell.swift in Sources */,
+				5D49EBB224576EA20039AB8D /* UIImageView+Ext.swift in Sources */,
 				7A7852F8244F410900651421 /* RecommendationsViewController.swift in Sources */,
 				7A7852F4244F410900651421 /* AppDelegate.swift in Sources */,
 				7A87BB41244F9A19008A8669 /* Stub.swift in Sources */,
