@@ -88,10 +88,10 @@ class RecommendationsViewController: UIViewController, UITableViewDataSource, UI
                             self.recommendations.append(recommendation)
                         }
                     }
-                    let sortedSlice = self.recommendations
-                        .filter( { $0.isReleased && !titlesOwned.contains($0.title) && !titlesSkipped.contains($0.title) })
+                    let sortedSlice = self.recommendations.lazy
                         .sorted( by: { $0.rating > $1.rating } )
                         .prefix(10)
+                    .filter( { $0.isReleased && !titlesOwned.contains($0.title) && !titlesSkipped.contains($0.title) })
                     self.recommendations = Array(sortedSlice)
                     Recommendation.cache(recommendations: self.recommendations)
                     
